@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Land Search Map – Near Burnaby, BC</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<style>
+  body { margin: 0; font-family: system-ui, sans-serif; }
+  #map { height: 100vh; width: 100%; }
+  .info-box { background: white; padding: 12px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.2); max-width: 280px; }
+  .info-box h3 { margin: 0 0 8px; font-size: 1.1em; }
+  .info-box p { margin: 4px 0; font-size: 0.9em; }
+  .price { color: #0a7; font-weight: bold; }
+  .legend { background: white; padding: 10px; border-radius: 8px; }
+</style>
+</head>
+<body>
+<div id="map"></div>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+const map = L.map('map').setView([49.25, -122.5], 8);
+
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  attribution: '&copy; OpenStreetMap contributors'
+}).addTo(map);
+
+// Burnaby marker
+const burnaby = L.marker([49.2488, -122.9805]).addTo(map)
+  .bindPopup('<div class="info-box"><h3>Burnaby (Your Location)</h3><p>Starting point</p></div>');
+
+// Areas and properties
+const points = [
+  {
+    lat: 49.1579, lng: -121.9514, name: "Chilliwack", type: "area",
+    popup: "<div class='info-box'><h3>Chilliwack</h3><p>~1 hour drive</p><p>Good selection of vacant lots from ~$145k–$400k+. Rural and hillside options.</p></div>"
+  },
+  {
+    lat: 49.1585, lng: -121.9480, name: "47165 Yale Road, Chilliwack", type: "property",
+    popup: "<div class='info-box'><h3>47165 Yale Road</h3><p class='price'>~$199,900</p><p>~15,000 sq ft lot</p><p>R1-A zoned, elevated, development potential. Verify with City of Chilliwack.</p></div>"
+  },
+  {
+    lat: 49.1000, lng: -121.9000, name: "1436 Frost Road #189, Chilliwack", type: "property",
+    popup: "<div class='info-box'><h3>1436 Frost Road #189</h3><p class='price'>~$144,900</p><p>~2,200 sq ft</p><p>Columbia Valley area. Smaller parcel.</p></div>"
+  },
+  {
+    lat: 49.1329, lng: -122.3114, name: "Mission", type: "area",
+    popup: "<div class='info-box'><h3>Mission</h3><p>~50–60 min drive</p><p>Rural lots, Lake Errock, Hemlock Valley options from ~$130k–$400k.</p></div>"
+  },
+  {
+    lat: 49.2000, lng: -122.0500, name: "44296 Bayview Road, Mission", type: "property",
+    popup: "<div class='info-box'><h3>44296 Bayview Road, Lake Errock</h3><p class='price'>~$399,000</p><p>~0.5 acre (20,650 sq ft)</p><p>RR-2 Rural Residential. Prepared building site, community water nearby. Lake/mountain setting.</p></div>"
+  },
+  {
+    lat: 49.0504, lng: -122.3045, name: "Abbotsford", type: "area",
+    popup: "<div class='info-box'><h3>Abbotsford</h3><p>~55–65 min</p><p>Building lots often $500k+. More urban/suburban focus.</p></div>"
+  },
+  {
+    lat: 49.7016, lng: -123.1558, name: "Squamish", type: "area",
+    popup: "<div class='info-box'><h3>Squamish</h3><p>~1h–1h15</p><p>Outdoor recreation hub. Freehold land typically higher priced ($650k+ common).</p></div>"
+  },
+  {
+    lat: 49.7500, lng: -123.1500, name: "Lot 14 Squamish Valley Rd", type: "property",
+    popup: "<div class='info-box'><h3>Lot 14 Squamish Valley Road</h3><p class='price'>~$472,000</p><p>C-3 Tourist Commercial</p><p>Potential for tourist uses. Verify zoning carefully.</p></div>"
+  },
+  {
+    lat: 49.3003, lng: -121.7811, name: "Harrison Hot Springs / Agassiz", type: "area",
+    popup: "<div class='info-box'><h3>Harrison Hot Springs / Agassiz</h3><p>~1h20–1h40</p><p>Recreation-focused. Some building lots and rural parcels available.</p></div>"
+  },
+  {
+    lat: 49.3200, lng: -121.7500, name: "46930 Sakwi Creek Rd (Hemlock)", type: "property",
+    popup: "<div class='info-box'><h3>46930 Sakwi Creek Road, Hemlock Valley</h3><p class='price'>~$374,900</p><p>~8,500 sq ft</p><p>ALP-2 zoning. Near Sasquatch Mountain Resort. Building permit noted in listing. Recreation focus.</p></div>"
+  },
+  {
+    lat: 49.3833, lng: -121.4419, name: "Hope", type: "area",
+    popup: "<div class='info-box'><h3>Hope</h3><p>~1h35–1h40</p><p>Further out. Smaller inventory; some lower-priced lots reported in broader searches.</p></div>"
+  },
+  {
+    lat: 50.3216, lng: -122.8075, name: "Pemberton (comparison)", type: "area",
+    popup: "<div class='info-box'><h3>Pemberton</h3><p>~2+ hours</p><p>Mountain lifestyle. Land available but longer drive. Some lots from mid-$500k.</p></div>"
+  }
+];
+
+points.forEach(p => {
+  const icon = p.type === 'property' 
+    ? L.divIcon({ className: 'property-marker', html: '<div style="background:#e74c3c;width:12px;height:12px;border-radius:50%;border:2px solid white;"></div>', iconSize: [16,16] })
+    : L.divIcon({ className: 'area-marker', html: '<div style="background:#3498db;width:14px;height:14px;border-radius:50%;border:2px solid white;"></div>', iconSize: [18,18] });
+  
+  L.marker([p.lat, p.lng], { icon }).addTo(map).bindPopup(p.popup);
+});
+
+// Legend
+const legend = L.control({ position: 'bottomright' });
+legend.onAdd = function() {
+  const div = L.DomUtil.create('div', 'legend');
+  div.innerHTML = '<strong>Legend</strong><br>🔵 Area / Region<br>🔴 Sample Property<br><small>Click markers for details. Prices approximate from recent listings; verify current status.</small>';
+  return div;
+};
+legend.addTo(map);
+
+// Note
+const note = L.control({ position: 'topright' });
+note.onAdd = function() {
+  const div = L.DomUtil.create('div', 'info-box');
+  div.innerHTML = '<h3>Notes</h3><p>Interactive map of areas within ~2 hours of Burnaby for vacant/rural land suitable for camping or future small dwelling.</p><p><strong>Key caveats:</strong> Mobile tiny homes / full-time RV living is generally not permitted as a principal residence. Permanent structures need BC Building Code compliance, septic/water approval, and proper zoning. Check ALR status and local bylaws.</p><p>Listings are examples only and may no longer be active.</p>';
+  return div;
+};
+note.addTo(map);
+</script>
+</body>
+</html>
